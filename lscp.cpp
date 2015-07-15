@@ -1,0 +1,66 @@
+//============================================================================
+// Name        : lscp.cpp
+// Author      :
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+using namespace std;
+#include "lscProtocolclass.h"
+#include "dlog.h"
+
+
+int main()
+{
+    int fd;
+
+    //VodLscp_play  *setupObject = new VodLscp_play(0, 0x7FFFFFFF, 0x1, 0x1, 0x0, 0xc, 0x6, 0x0, 0x1234);
+    //VodLscp_jump  *setupObject = new VodLscp_jump(0x10111011, 0x7FFFFFFF, 0x1, 0x1, 0x0, 0xd, 0x7, 0x0, 0x1234);
+    //VodLscp_reset  *setupObject = new VodLscp_reset(0x0, 0xf, 0x8, 0x0, 0x1234);
+    VodLscp_status *setupObject =
+        new VodLscp_status(0x0, 0xf, 0x9, 0x0, 0x1234);
+    //VodLscp_resume  *setupObject = new VodLscp_resume(0, 0x4, 0x1, 0x0, 0x3, 0xa, 0x0, 0x1234);
+    //VodLscp_pause  *setupObject = new VodLscp_pause(0x1e7fc2ff, 0x0, 0xf, 0x9, 0x0, 0x1234);
+    unsigned char *p1 = NULL;
+    unsigned int length = 0;
+    setupObject-> PackLscpMessageBody((unsigned char **) &p1, &length);
+
+    if (length > 0)
+    {
+        for (ui32 i = 0; i < length; i++)
+            dlog(DL_MSP_ONDEMAND, DLOGL_NOISE, "%2x ", p1[i]);
+    }
+
+#if 0
+    unsigned char ssReq[194] = {0x11/*prot des*/, 0x02/*dsmcc type*/, 0x40, 0x10/*msgId*/, 0x00, 0x00, 0x00, 0x01/*transId*/, 0xFF/*res*/, 0x00/*adpt len*/, 0x00, 0x6A/*body len*/, //12 Hdr size
+                                0x11, 0x02, 0x40, 0x10, 0x00, 0x00, 0x00, 0x01, 0xFF, 0x00, // 10 sessionid
+                                0x11, 0x02, 0x40, 0x10, 0x00, 0x00, 0x00, 0x01, 0xFF, 0x00, 0x11, 0x02, 0x40, 0x10, 0x00, 0x00, 0x00, 0x01, 0xFF, 0x00, //20 client id
+                                0x11, 0x02, 0x40, 0x10, 0x00, 0x00, 0x00, 0x01, 0xFF, 0x00, 0x11, 0x02, 0x40, 0x10, 0x00, 0x00, 0x00, 0x01, 0xFF, 0x00, //20 serverid
+                                0x00, 0x00, //uudata count    2
+                                0x00, 0x35, // private count  2  decimal size 53
+                                0x01, 0x01, 0x04, ///desc count  3
+                                0x01, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, //10  assetid
+                                0x02, 0x06, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, //8 node group
+                                0x80, 0x09, //11 sea req
+                                0x01, 0x01, 0x02,
+                                0x01, 0x01, 0x02,
+                                0x02, 0x01, 0x01,
+                                0x05, 0x0F, //17  app req
+                                0x80, 0x01, 0x02,
+                                0x03, 0x04, 0x00, 0x00, 0x00, 0x00,
+                                0x04, 0x04, 0x00, 0x00, 0x00, 0x00,
+                               };
+#endif
+
+    fd = setupObject->GetSocket("64.100.106.248", 9934);
+
+    if (fd != -1)
+    {
+        setupObject->SendMessage(fd, p1, length);
+    }
+    cout << "length:  " << length << endl;
+    cout << "!!!Hello !!!" << endl; // prints !!!Hello World!!!
+    return 0;
+}
